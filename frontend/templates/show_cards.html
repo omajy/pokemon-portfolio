@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show Cards</title>
+</head>
+<body>
+    <h1>All Cards</h1>
+    
+    {% if cards %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Character</th>
+                    <th>Set Number</th>
+                    <th>Set Name</th>
+                    <th>Era</th>
+                    <th>Grade</th>
+                    <th>Live Price</th>
+                    <th>Purchase Price</th>
+                    <th>ROI</th>
+                    <th>Image</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for card in cards %}
+                    <tr>
+                        <td>{{ card.character }}</td>
+                        <td>{{ card.set_number }}</td>
+                        <td>{{ card.set_name }}</td>
+                        <td>{{ card.era }}</td>
+                        <td>{{ card.grade }}</td>
+                        <td>{{ card.live_price }}</td>
+                        <td>{{ card.purchase_price }}</td>
+                        <td>{{ card.roi }}</td>
+                        <td>
+                            {% if card.image_url %}
+                                <img src="{{ card.image_url }}" alt="{{ card.character }}" width="100">
+                            {% else %}
+                                No image
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No cards found.</p>
+    {% endif %}
+
+</body>
+</html>
