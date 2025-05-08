@@ -32,7 +32,7 @@ class Card(db.Model):
 with app.app_context():
     db.create_all()
 
-@app.route('/show')
+@app.route('/')
 def show_cards():
     cards = Card.query.all()
     return render_template('show_cards.html', cards=cards)
@@ -46,12 +46,14 @@ def add_card():
         set_name = request.form['set_name']
         era = request.form['era']
         grade = request.form['grade']
-        live_price = float(request.form['live_price'])
-        purchase_price = float(request.form['purchase_price'])
-        roi = float(request.form['roi'])
-        image_url = request.form['image_url']
+        purchase_price = float(request.form['purchase_price'])  # Get purchase price from form
 
-        # Add card to database
+        # Calculate live price and ROI (placeholders for now)
+        live_price = purchase_price * 1.2  # Placeholder live price calculation
+        roi = roi = round(((live_price - purchase_price) / purchase_price) * 100, 2)   # Calculate ROI
+        image_url = f"https://img.pokemondb.net/artwork/large/{character.lower()}.jpg"  # Placeholder image URL
+
+        # Add card to the database
         new_card = Card(
             character=character, 
             set_number=set_number, 
@@ -65,11 +67,10 @@ def add_card():
         )
         db.session.add(new_card)
         db.session.commit()
-        
-        return "Card added successfully!"
+
+        return redirect(url_for('show_cards'))
     
     return render_template('add_card.html')
-
 
 if __name__ == '__main__':
     app.run(debug=True)

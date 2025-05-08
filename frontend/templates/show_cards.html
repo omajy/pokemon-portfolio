@@ -6,7 +6,11 @@
     <title>Show Cards</title>
 </head>
 <body>
-    <h1>All Cards</h1>
+    <h1>Your Portfolio</h1>
+
+    <form action="/add">
+        <button type="submit">Add a Slab</button>
+    </form>
     
     {% if cards %}
         <table>
@@ -48,6 +52,8 @@
     {% else %}
         <p>No cards found.</p>
     {% endif %}
+
+
 
 </body>
 </html>
