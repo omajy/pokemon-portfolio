@@ -3,15 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Show Cards</title>
+    <title>Pokémon Card Portfolio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1, h2, h3 {
+            color: #e3350d;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3B4CCA;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        img {
+            border-radius: 5px;
+        }
+        button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .add-button {
+            background-color: #3B4CCA;
+            color: white;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        .delete-button {
+            background-color: #e3350d;
+            color: white;
+        }
+        .delete-form {
+            margin: 0;
+        }
+        .portfolio-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3B4CCA;
+            margin: 10px 0;
+        }
+        .positive-roi {
+            color: green;
+        }
+        .negative-roi {
+            color: red;
+        }
+        .featured-card {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .featured-card img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        .featured-card-info {
+            flex-grow: 1;
+        }
+        .featured-card-info p {
+            margin: 5px 0;
+        }
+        .top-characters {
+            margin-top: 15px;
+        }
+        .character-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .period-selector {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .period-selector select {
+            padding: 8px;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Your Portfolio</h1>
+    <h1>Your Pokémon Card Portfolio</h1>
 
+    <!-- Time period selector (placeholder for future functionality) -->
+    <div class="period-selector">
+        <label for="time-period">Time Period:</label>
+        <select id="time-period">
+            <option value="all-time">All Time</option>
+            <option value="1-month">Last Month</option>
+            <option value="3-months">Last 3 Months</option>
+            <option value="1-year">Last Year</option>
+        </select>
+    </div>
+
+    <!-- Portfolio Dashboard -->
+    <div class="portfolio-dashboard">
+        <!-- Total Portfolio Value -->
+        <div class="stat-card">
+            <h3>Total Portfolio Value</h3>
+            <div class="stat-value">${{ stats.total_value|round(2) }}</div>
+            <p>Total Cost: ${{ stats.total_cost|round(2) }}</p>
+            <p>Overall ROI: 
+                <span class="{% if stats.total_roi >= 0 %}positive-roi{% else %}negative-roi{% endif %}">
+                    {{ stats.total_roi|round(2) }}%
+                </span>
+            </p>
+            <p>Total Cards: {{ stats.total_cards }}</p>
+        </div>
+        
+        <!-- Highest ROI Card -->
+        {% if stats.highest_roi_card %}
+        <div class="stat-card">
+            <h3>Highest ROI Card</h3>
+            <div class="featured-card">
+                {% if stats.highest_roi_card.image_url %}
+                <img src="{{ stats.highest_roi_card.image_url }}" alt="{{ stats.highest_roi_card.character }}">
+                {% endif %}
+                <div class="featured-card-info">
+                    <div class="stat-value">{{ stats.highest_roi_card.roi }}%</div>
+                    <p><strong>{{ stats.highest_roi_card.character }}</strong> (PSA {{ stats.highest_roi_card.grade }})</p>
+                    <p>{{ stats.highest_roi_card.set_name }} #{{ stats.highest_roi_card.set_number }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Highest Value Card -->
+        {% if stats.highest_value_card %}
+        <div class="stat-card">
+            <h3>Most Valuable Card</h3>
+            <div class="featured-card">
+                {% if stats.highest_value_card.image_url %}
+                <img src="{{ stats.highest_value_card.image_url }}" alt="{{ stats.highest_value_card.character }}">
+                {% endif %}
+                <div class="featured-card-info">
+                    <div class="stat-value">${{ stats.highest_value_card.live_price|round(2) }}</div>
+                    <p><strong>{{ stats.highest_value_card.character }}</strong> (PSA {{ stats.highest_value_card.grade }})</p>
+                    <p>{{ stats.highest_value_card.set_name }} #{{ stats.highest_value_card.set_number }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Top Characters by ROI -->
+        <div class="stat-card">
+            <h3>Top Characters by ROI</h3>
+            <div class="top-characters">
+                {% if stats.top_characters %}
+                    {% for char, data in stats.top_characters %}
+                    <div class="character-item">
+                        <span><strong>{{ char }}</strong> ({{ data.count }} cards)</span>
+                        <span class="{% if data.roi >= 0 %}positive-roi{% else %}negative-roi{% endif %}">
+                            {{ data.roi }}%
+                        </span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No character data available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Card Button -->
     <form action="/add">
-        <button type="submit">Add a Slab</button>
+        <button type="submit" class="add-button">Add a Slab</button>
     </form>
     
+    <!-- Card Table -->
     {% if cards %}
         <table>
             <thead>
@@ -25,6 +224,7 @@
                     <th>Purchase Price</th>
                     <th>ROI</th>
                     <th>Image</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -35,9 +235,11 @@
                         <td>{{ card.set_name }}</td>
                         <td>{{ card.era }}</td>
                         <td>{{ card.grade }}</td>
-                        <td>{{ card.live_price }}</td>
-                        <td>{{ card.purchase_price }}</td>
-                        <td>{{ card.roi }}</td>
+                        <td>${{ card.live_price|round(2) }}</td>
+                        <td>${{ card.purchase_price|round(2) }}</td>
+                        <td class="{% if card.roi >= 0 %}positive-roi{% else %}negative-roi{% endif %}">
+                            {{ card.roi }}%
+                        </td>
                         <td>
                             {% if card.image_url %}
                                 <img src="{{ card.image_url }}" alt="{{ card.character }}" width="100">
@@ -45,15 +247,25 @@
                                 No image
                             {% endif %}
                         </td>
+                        <td>
+                            <form action="{{ url_for('delete_card', card_id=card.id) }}" method="post" class="delete-form">
+                                <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete this card?')">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     {% else %}
-        <p>No cards found.</p>
+        <p>No cards found. Add your first card to start building your portfolio!</p>
     {% endif %}
 
-
-
+    <script>
+        // This is a placeholder for future time period filtering functionality
+        document.getElementById('time-period').addEventListener('change', function() {
+            // In the future, this could trigger a form submission or AJAX request to filter data
+            console.log('Selected time period:', this.value);
+        });
+    </script>
 </body>
 </html>
